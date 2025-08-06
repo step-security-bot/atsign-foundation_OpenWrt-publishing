@@ -42,6 +42,9 @@ env:
   ARTIFACT_RETENTION_DAYS: 3
 ### 结束
 
+permissions:
+  contents: read
+
 jobs:
   compile:
     runs-on: ubuntu-22.04
@@ -64,7 +67,7 @@ jobs:
 
     steps:
       - name: Get system info
-        uses: kenchan0130/actions-system-info@master
+        uses: kenchan0130/actions-system-info@f052b582679c1c21444b04822a375533585dac32 # master
         id: system-info
       - name: Print system info
         shell: bash
@@ -83,7 +86,7 @@ jobs:
 
       - name: Maximize Build Space
         if: env.DELETE_USELESS_FILES == 'true' && !cancelled()
-        uses: easimon/maximize-build-space@master
+        uses: easimon/maximize-build-space@c28619d8999a147d5e09c1199f84ff6af6ad5794 # master
         with:
           root-reserve-mb: 20480
           swap-size-mb: 8192
@@ -116,7 +119,7 @@ jobs:
           echo "BUILDBRANCH=$BUILDBRANCH" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.BUILDBRANCH }}
           lfs: true
@@ -134,7 +137,7 @@ jobs:
 
       - name: Cache FEED
         if: env.CACHE_DOWNLOAD == 'true' && !cancelled()
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: /workdir/FEEDS/${{ env.BRANCH }}
           key: Cache-FEEDS-${{ env.BRANCH }}-${{ hashFiles('**/Makefile') }}
@@ -150,7 +153,7 @@ jobs:
 
       - name: Cache DL dependencies
         if: env.CACHE_DOWNLOAD == 'true' && !cancelled()
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: /workdir/DL
           key: Cache-DL-${{ env.BRANCH }}-${{ hashFiles('**/Makefile') }}
@@ -366,14 +369,14 @@ jobs:
 
       - name: Upload Specials Logs
         if: ${{ failure() && steps.build_specials.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: Specials-logs-${{ env.OP_VERSION }}-${{ inputs.ARCH }}-${{ inputs.BOARD }}-${{ inputs.SUBTARGET }}-${{ inputs.MODEL }}-${{ hashFiles('**/Makefile') }}
           path: ${{ github.workspace }}/SPECIAL_WORKDIR/SDK/logs
 
       - name: Build Packages
         id: build_packags
-        uses: fantastic-packages/gh-action-sdk@24.10
+        uses: fantastic-packages/gh-action-sdk@b5174879f783016c7f5006190d2f5d082ed0c081 # 24.10
         env:
           #ARCH: ${{ inputs.ARCH }}-${{ env.OP_VERSION }}
           ARCH: ${{ inputs.ARCH }}-${{ env.SNAPSHOTS != 'y' && format('{0}-', env.BRANCH) || '' }}SNAPSHOT
@@ -391,7 +394,7 @@ jobs:
 
       - name: Upload error logs
         if: ${{ failure() && steps.build_packags.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: error-logs-${{ env.OP_VERSION }}-${{ inputs.ARCH }}-${{ inputs.BOARD }}-${{ inputs.SUBTARGET }}-${{ inputs.MODEL }}-${{ hashFiles('**/Makefile') }}
           path: /workdir/logs
@@ -476,7 +479,7 @@ jobs:
 
       - name: Build Images
         if: env.build_mode == 'build_imgs' && !cancelled()
-        uses: fantastic-packages/gh-action-imagebuilder@24.10
+        uses: fantastic-packages/gh-action-imagebuilder@a910d8f6da1a8403a348ed29eaefa3f8ae9776d5 # 24.10
         env:
           ARCH: ${{ inputs.BOARD }}-${{ inputs.SUBTARGET }}-${{ env.OP_VERSION }}
           PROFILE: ${{ inputs.MODEL }}
@@ -523,7 +526,7 @@ jobs:
         working-directory: ${{ inputs.GHPAGES_PATH }}/
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ env.artifact }}
           path: |
